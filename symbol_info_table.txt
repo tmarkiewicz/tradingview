@@ -1,0 +1,23 @@
+// This source code is subject to the terms of the Mozilla Public License 2.0 at https://mozilla.org/MPL/2.0/
+// © tmarkiewicz
+
+//@version=4
+study("Symbol Info Table", "INFO", overlay=true)
+
+// Inputs
+atrLength   = input(title="ATR Length", type=input.integer, defval=14, minval=1, group="ATR Settings")
+showATR     = input(title="Show ATR?", type=input.bool, defval=true, group="Display Settings")
+atrColor    = input(title="ATR Color", type=input.color, defval=color.new(color.gray, 100), group="Display Settings")
+atrLocation = input(title="ATR Location", type=input.string, defval="BR", options=["TR", "TC", "BR", "BL"], group="Display Settings")
+
+// Calculate data
+atr = atr(atrLength)
+
+// Create table
+var table resultTable = table.new(atrLocation == "BR" ? position.bottom_right : atrLocation == "TR" ? position.top_right : atrLocation == "TC" ? position.top_center : position.bottom_left, 1, 1, border_width=3)
+f_fillCell(_table, _column, _row, _value, _text) =>
+    _cellText = _text + ": " +tostring(_value, "#.##") + "\n"
+    table.cell(_table, _column, _row, _cellText, bgcolor=atrColor, text_color=color.new(atrColor, 0))
+
+if barstate.islast and showATR
+    f_fillCell(resultTable, 0, 0, atr, "ATR")
